@@ -7,7 +7,7 @@
 class Logger
 {
 public:
-    Logger(const char* filename, const char* attr = "wb") : m_fp(0)
+    Logger(const char* filename, const char* attr = "w") : m_fp(0)
     {
         VERIFY(filename != 0);
 
@@ -25,6 +25,11 @@ public:
         }
     }
 
+    operator FILE*() const
+    {
+        return fp();
+    }
+
     FILE* fp() const
     {
         VERIFY(m_fp != 0);
@@ -32,8 +37,6 @@ public:
     }
 
 private:
-    Logger() {}
-
     FILE* m_fp;
 };
 
