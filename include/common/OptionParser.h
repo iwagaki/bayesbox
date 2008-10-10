@@ -82,6 +82,28 @@ public:
 };
 
 
+class OptionHolderBool : public OptionHolder
+{
+public:
+    OptionHolderBool(bool value, const char* pIdentifier, const char* pDescription) :
+        OptionHolder(pIdentifier, pDescription), m_value(value), m_default(value) {}
+    
+    void help()
+    {
+        printf("    --%-30s  %s (%d)\n", m_pIdentifier, m_pDescription, (int)m_value);
+    }
+
+    void setValue(const char* pString)
+    {
+        VERIFY(pString == 0);
+        m_value = !m_default;
+    }
+    
+    bool m_value;
+    bool m_default;
+};
+
+
 class OptionParser
 {
 public:
@@ -104,6 +126,14 @@ public:
     static const char*& create(const char* value, const char* pIdentifier, const char* pDescription)
     {
         OptionHolderString* p = new OptionHolderString(value, pIdentifier, pDescription);
+        m_optionList.push_back(p);
+
+        return p->m_value;
+    }
+    
+    static bool& create(bool value, const char* pIdentifier, const char* pDescription)
+    {
+        OptionHolderBool* p = new OptionHolderBool(value, pIdentifier, pDescription);
         m_optionList.push_back(p);
 
         return p->m_value;
@@ -153,12 +183,10 @@ public:
 
         char* p = argv[index];
 
-        if (*p++ != '-')
+        if (strncmp(p, "--", 2) != 0)
             VERIFY("invalid parameter" && 0);
- 
-        if (*p++ != '-')
-            VERIFY("invalid parameter" && 0);
-
+        
+        p += 2;
         ++index;
         pParameter = 0;
 
@@ -166,7 +194,7 @@ public:
         {
             char* p2 = argv[index];
         
-            if (*p2 != '-')
+            if (strncmp(p2, "--", 2) != 0)
             {
                 pParameter = p2;
                 ++index;
