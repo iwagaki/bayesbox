@@ -141,7 +141,7 @@ public:
 
     static void helpAll()
     {
-        printf("OptionHolders:\n");
+        printf("Options:\n");
 
         for (std::vector<OptionHolder*>::iterator i = m_optionList.begin(); i != m_optionList.end(); ++i)
             (*i)->help();
