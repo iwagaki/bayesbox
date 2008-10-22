@@ -107,7 +107,7 @@ public:
 class OptionParser
 {
 public:
-    static int& create(int value, const char* pIdentifier, const char* pDescription)
+    static int& createOption(int value, const char* pIdentifier, const char* pDescription)
     {
         OptionHolderInt* p = new OptionHolderInt(value, pIdentifier, pDescription);
         m_optionList.push_back(p);
@@ -115,7 +115,7 @@ public:
         return p->m_value;
     }
 
-    static double& create(double value, const char* pIdentifier, const char* pDescription)
+    static double& createOption(double value, const char* pIdentifier, const char* pDescription)
     {
         OptionHolderDouble* p = new OptionHolderDouble(value, pIdentifier, pDescription);
         m_optionList.push_back(p);
@@ -123,7 +123,7 @@ public:
         return p->m_value;
     }
 
-    static const char*& create(const char* value, const char* pIdentifier, const char* pDescription)
+    static const char*& createOption(const char* value, const char* pIdentifier, const char* pDescription)
     {
         OptionHolderString* p = new OptionHolderString(value, pIdentifier, pDescription);
         m_optionList.push_back(p);
@@ -131,7 +131,7 @@ public:
         return p->m_value;
     }
     
-    static bool& create(bool value, const char* pIdentifier, const char* pDescription)
+    static bool& createOption(bool value, const char* pIdentifier, const char* pDescription)
     {
         OptionHolderBool* p = new OptionHolderBool(value, pIdentifier, pDescription);
         m_optionList.push_back(p);
