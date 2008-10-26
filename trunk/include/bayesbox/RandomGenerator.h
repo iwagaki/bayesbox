@@ -1,6 +1,8 @@
 #ifndef RANDOM_GENERATOR_H_
 #define RANDOM_GENERATOR_H_
 
+#include <sys/time.h>
+
 #include <cstdlib>
 #include <ctime>
 #include <gsl/gsl_rng.h>
@@ -12,6 +14,8 @@
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 //#include <boost/random.hpp>
+
+#include "common/verify.h"
 
 using namespace boost::numeric;
 
@@ -25,7 +29,14 @@ public:
         if (!m_rng)
             abort();
 
-        gsl_rng_set(m_rng, time(0));
+        struct timeval tv;
+        struct timezone tz;
+        int rc = gettimeofday(&tv, &tz);
+        VERIFY(rc == 0)
+
+        unsigned long long now = tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+
+        gsl_rng_set(m_rng, now);
     }
 
     ~RandomGenerator()
