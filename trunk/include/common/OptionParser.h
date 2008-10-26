@@ -69,7 +69,8 @@ public:
     
     void help()
     {
-        printf("    --%-30s  %s (%s)\n", m_pIdentifier, m_pDescription, m_value);
+        const char* value = m_value ? m_value : "NULL";
+        printf("    --%-30s  %s (%s)\n", m_pIdentifier, m_pDescription, value);
     }
 
     void setValue(const char* pString)
