@@ -11,6 +11,7 @@ public:
     OptionHolder(const char* pIdentifier, const char* pDescription) :
         m_pIdentifier(pIdentifier), m_pDescription(pDescription) {}
 
+    virtual ~OptionHolder() {}
     virtual void help() = 0;
     virtual void setValue(const char* pString) = 0;
 
@@ -108,6 +109,14 @@ public:
 class OptionParser
 {
 public:
+    OptionParser() {}
+
+    virtual ~OptionParser()
+    {
+        for (std::vector<OptionHolder*>::iterator i = m_optionList.begin(); i != m_optionList.end(); ++i)
+            delete *i;
+    }
+
     static int& createOption(int value, const char* pIdentifier, const char* pDescription)
     {
         OptionHolderInt* p = new OptionHolderInt(value, pIdentifier, pDescription);
