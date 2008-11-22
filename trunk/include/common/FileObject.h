@@ -15,7 +15,7 @@ class IFileObject
 public:
     virtual ~IFileObject() {}
     virtual void writeObject(FILE* fp) = 0;
-    virtual int readObject(FILE* fp) = 0;
+    virtual void readObject(FILE* fp) = 0;
 };
 
 class FileObject
@@ -23,6 +23,8 @@ class FileObject
 public:
     template<typename T> static void writeObject(FILE* fp, std::vector<T>& v)
     {
+        fprintf(fp, "%d\n", v.size());
+
         for (typename std::vector<T>::iterator i = v.begin(); i != v.end(); ++i)
         {
             IFileObject& file_object = *i;
@@ -33,10 +35,16 @@ public:
     template<typename T> static void readObject(FILE* fp, std::vector<T>& v)
     {
         T object;
+        int size = 0;
         IFileObject& file_object = object;
 
-        while (file_object.readObject(fp) > 0)
+        VERIFY(fscanf(fp, "%d\n", &size) == 1);
+
+        for(unsigned i = 0; i < size; ++i)
+        {
+            file_object.readObject(fp);
             v.push_back(object);
+        }
     }
 
     static void writeObject(FILE* fp, boost::numeric::ublas::vector<double>& v)
@@ -44,7 +52,7 @@ public:
         fprintf(fp, "%d\n", v.size());
 
         for (unsigned i = 0; i < v.size(); ++i)
-            fprintf(fp, "%lf\n", v(i));
+            fprintf(fp, "%.15le\n", v(i));
     }
 
     static void readObject(FILE* fp, boost::numeric::ublas::vector<double>& v)
@@ -58,7 +66,7 @@ public:
         {
             double element = 0.0;
 
-            VERIFY(fscanf(fp, "%lf\n", &element) == 1);
+            VERIFY(fscanf(fp, "%le\n", &element) == 1);
             v(i) = element;
         }
     }
