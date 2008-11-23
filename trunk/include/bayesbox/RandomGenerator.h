@@ -3,17 +3,12 @@
 
 #include <sys/time.h>
 
-#include <cstdlib>
-#include <ctime>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-
-#include <gsl/gsl_vector.h>
-#include <gsl/gsl_matrix.h>
+// #include <cstdlib>
+// #include <ctime>
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-//#include <boost/random.hpp>
+#include <boost/random.hpp>
 
 #include "common/verify.h"
 
@@ -22,13 +17,8 @@ using namespace boost::numeric;
 class RandomGenerator
 {
 public:
-    RandomGenerator() : m_rng(0)
+    RandomGenerator()
     {
-        m_rng = gsl_rng_alloc(gsl_rng_default);
-
-        if (!m_rng)
-            abort();
-
         struct timeval tv;
         struct timezone tz;
         int rc = gettimeofday(&tv, &tz);
@@ -36,22 +26,28 @@ public:
 
         unsigned long long now = tv.tv_sec * 1000 * 1000 + tv.tv_usec;
 
-        gsl_rng_set(m_rng, now);
+        m_boost_rng = new boost::mt19937(static_cast<unsigned>(now));
     }
 
     ~RandomGenerator()
     {
-        gsl_rng_free(m_rng);
+        delete m_boost_rng;
     }
-    
+
     double gaussian(double sigma)
     {
-        return gsl_ran_gaussian(m_rng, sigma);
+        boost::normal_distribution<> normal(0.0, sigma);
+        boost::variate_generator< boost::mt19937&, boost::normal_distribution<double> > normal_sampler(*m_boost_rng, normal);
+
+        return normal_sampler();
     }
 
     double uniform()
     {
-        return gsl_rng_uniform(m_rng);
+        boost::uniform_real<> uniform(0.0, 1.0);
+        boost::variate_generator< boost::mt19937&, boost::uniform_real<> > uniform_sampler(*m_boost_rng, uniform);
+
+        return uniform_sampler();
     }
 
 //     void gaussian(gsl_vector* pVector, double sigma, double coef, double cons)
@@ -61,6 +57,27 @@ public:
 //             gsl_vector_set(pVector, i, gsl_vector_get(pVector, i) + gsl_ran_gaussian(m_rng, sigma) * coef + cons);
 //         }
 //     }
+
+    ublas::vector<double> gaussian(double sigma, unsigned size)
+    {
+        ublas::vector<double> r(size);
+
+        for (unsigned i = 0; i < size; ++i)
+            r(i) = gaussian(sigma);
+        
+        return r;
+    }
+
+    ublas::matrix<double> gaussian(double sigma, unsigned size1, unsigned size2)
+    {
+        ublas::matrix<double> r(size1, size2);
+
+        for (unsigned i = 0; i < size1; ++i)
+            for (unsigned j = 0; j < size2; ++j)
+                r(i, j) = gaussian(sigma);
+        
+        return r;
+    }
 
     ublas::vector<double> gaussian(ublas::vector<double> v, double sigma, double coef, double cons)
     {
@@ -82,36 +99,6 @@ public:
         return v;
     }
         
-//     void uniform(gsl_vector* pVector, double coef, double cons)
-//     {
-//         for (size_t i = 0; i < pVector->size; ++i)
-//         {
-//             gsl_vector_set(pVector, i, gsl_vector_get(pVector, i) + gsl_rng_uniform(m_rng) * coef + cons);
-//         }
-//     }
-
-//     void gaussian(gsl_matrix* pMatrix, double sigma, double coef, double cons)
-//     {
-//         for (size_t i = 0; i < pMatrix->size1; ++i)
-//         {
-//             for (size_t j = 0; j < pMatrix->size2; ++j)
-//             {
-//                 gsl_matrix_set(pMatrix, i, j, gsl_matrix_get(pMatrix, i, j) + gsl_ran_gaussian(m_rng, sigma) * coef + cons);
-//             }
-//         }
-//     }
-
-//     void uniform(gsl_matrix* pMatrix, double coef, double cons)
-//     {
-//         for (size_t i = 0; i < pMatrix->size1; ++i)
-//         {
-//             for (size_t j = 0; j < pMatrix->size2; ++j)
-//             {
-//                 gsl_matrix_set(pMatrix, i, j, gsl_matrix_get(pMatrix, i, j) + gsl_rng_uniform(m_rng) * coef + cons);
-//             }
-//         }
-//     }
-
     ublas::matrix<double> uniform(ublas::matrix<double> m, double coef, double cons)
     {
         for (unsigned i = 0; i < m.size1(); ++i)
@@ -145,12 +132,7 @@ public:
     }
 
 private:
-    // boost::variate_generator< boost::mt19937, boost::uniform_real<> > m_rngUniform;
-    // boost::variate_generator< boost::normal_distribution, boost::uniform_real<> > m_rngUniform;
-    
-
-
-    gsl_rng *m_rng;
+    boost::mt19937* m_boost_rng;
 };
 
 
