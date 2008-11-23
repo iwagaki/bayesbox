@@ -3,9 +3,6 @@
 
 #include <sys/time.h>
 
-// #include <cstdlib>
-// #include <ctime>
-
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/random.hpp>
@@ -49,14 +46,6 @@ public:
 
         return uniform_sampler();
     }
-
-//     void gaussian(gsl_vector* pVector, double sigma, double coef, double cons)
-//     {
-//         for (size_t i = 0; i < pVector->size; ++i)
-//         {
-//             gsl_vector_set(pVector, i, gsl_vector_get(pVector, i) + gsl_ran_gaussian(m_rng, sigma) * coef + cons);
-//         }
-//     }
 
     ublas::vector<double> gaussian(double sigma, unsigned size)
     {
