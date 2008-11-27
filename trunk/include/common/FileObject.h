@@ -47,12 +47,25 @@ public:
         }
     }
 
+    inline static void writeObject(FILE* fp, double v)
+    {
+        fprintf(fp, "%.15le\n", v);
+    }
+
+    inline static double readObject(FILE* fp)
+    {
+        double element = 0.0;
+        VERIFY(fscanf(fp, "%le\n", &element) == 1);
+
+        return element;
+    }
+
     static void writeObject(FILE* fp, boost::numeric::ublas::vector<double>& v)
     {
         fprintf(fp, "%d\n", v.size());
 
         for (unsigned i = 0; i < v.size(); ++i)
-            fprintf(fp, "%.15le\n", v(i));
+            writeObject(fp, v(i));
     }
 
     static void readObject(FILE* fp, boost::numeric::ublas::vector<double>& v)
@@ -63,12 +76,7 @@ public:
         v.resize(size);
 
         for (unsigned i = 0; i < size; ++i)
-        {
-            double element = 0.0;
-
-            VERIFY(fscanf(fp, "%le\n", &element) == 1);
-            v(i) = element;
-        }
+            v(i) = readObject(fp);
     }
 
     static void writeObject(FILE* fp, boost::numeric::ublas::matrix<double>& m)
@@ -77,7 +85,7 @@ public:
 
         for (unsigned i = 0; i < m.size1(); ++i)
             for (unsigned j = 0; j < m.size2(); ++j)
-                fprintf(fp, "%.15le\n", m(i, j));
+                writeObject(fp, m(i, j));
     }
 
     static void readObject(FILE* fp, boost::numeric::ublas::matrix<double>& m)
@@ -88,15 +96,8 @@ public:
         m.resize(size1, size2);
 
         for (unsigned i = 0; i < size1; ++i)
-        {
             for (unsigned j = 0; j < size2; ++j)
-            {
-                double element = 0.0;
-
-                VERIFY(fscanf(fp, "%le\n", &element) == 1);
-                m(i, j) = element;
-            }
-        }
+                m(i, j) = readObject(fp);
     }
 };
 
