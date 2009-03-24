@@ -33,16 +33,16 @@ public:
 
     double gaussian(double sigma)
     {
-        boost::normal_distribution<> normal(0.0, sigma);
-        boost::variate_generator< boost::mt19937&, boost::normal_distribution<double> > normal_sampler(*m_boost_rng, normal);
+        boost::normal_distribution<> normal_dist(0.0, sigma);
+        boost::variate_generator< boost::mt19937&, boost::normal_distribution<double> > normal_sampler(*m_boost_rng, normal_dist);
 
         return normal_sampler();
     }
 
     double uniform()
     {
-        boost::uniform_real<> uniform(0.0, 1.0);
-        boost::variate_generator< boost::mt19937&, boost::uniform_real<> > uniform_sampler(*m_boost_rng, uniform);
+        boost::uniform_real<> uniform_dist(0.0, 1.0);
+        boost::variate_generator< boost::mt19937&, boost::uniform_real<> > uniform_sampler(*m_boost_rng, uniform_dist);
 
         return uniform_sampler();
     }
