@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <vector>
+#include <cstring>
 #include "common/verify.h"
 
 class OptionHolder
